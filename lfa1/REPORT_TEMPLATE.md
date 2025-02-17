@@ -29,6 +29,20 @@ As defined by the laboratory work task, we have to implement a regular grammar. 
 An instance of the Grammar class should include non-terminal, terminal and production rules for the given grammar. These properties were implemented using dictionaries to ensure uniqueness and to optimize `in` and lookup operations. For production rules, the values are tuples to ensure their immutability, since these rules should not change throughout the execution of the program. 
 
 To generate a random string from the given grammar, we start off from the start symbol and then randomly apply production rules based on the non-terminal symbols left in the resulting word. As soon as there are no non-terminals left, we can return the word.
+```python
+def generate_string(self, start_symbol='S'):
+    result = start_symbol
+
+    while any(symbol in self.nonterminal for symbol in result):
+        for symbol in result:
+            if symbol in self.nonterminal:
+                rule = random.choice(self.production_rules[symbol])
+
+                result = result.replace(symbol, rule, 1)
+                break
+
+    return result
+```
 
 To generate the Finite Automaton (described in next section), we have to define the states (non-terminal symbols + final state), transitions and the alphabet, which will be passed to the Finite Automaton instance accordingly.
 
@@ -38,6 +52,24 @@ The FiniteAutomaton class implements a finite automaton designed to determine wh
 The implementation uses sets for storing states, the alphabet, and final states. This choice ensures uniqueness while providing fast membership checking. Dictionaries are used for transition mappings, allowing quick state transitions by mapping an input symbol to its corresponding state. This nested dictionary structure optimizes lookup speed, making the automaton efficient in handling state changes.
 
 This approach offers several advantages over alternative implementations. Using sets instead of lists ensures faster membership checks, eliminating the need for iterative searches. Similarly, using a nested dictionary for transitions allows direct state-input mapping, avoiding the inefficiencies of a flat dictionary structure. Additionally, the class provides dynamic state modifications through methods like `add_transition`, `set_start_state`, and `add_final_state`, allowing the automaton to be updated without reconstruction (similar to using setters and getters in OOP, which is usually a good practice).
+
+Below is the implementation of `string_belong_to_language` function, which checks whether or not a string belongs to the given grammar. 
+```python
+def string_belong_to_language(self, input_string):
+    current_state = self.initial_state
+    for char in input_string:
+        if char not in self.alphabet:
+            return False
+
+        state_transitions = self.transitions.get(current_state, {})
+
+        if char not in state_transitions:
+            return False
+
+        current_state = state_transitions[char]
+
+    return current_state in self.final_states
+```
 
 Compared to alternative implementations that might use lists for state storage or a flat dictionary for transitions, this design prioritizes speed and adaptability. Even though lists are easier, they introduce slower membership checks, and flat dictionaries lack the efficiency of structured state-input mappings. By structuring the automaton in this manner, the implementation remains optimized for both performance and flexibility, making it a robust choice for deterministic finite state recognition.
 
