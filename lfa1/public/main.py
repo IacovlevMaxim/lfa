@@ -19,7 +19,7 @@ class Grammar:
         self.terminal = {'a', 'b', 'c'}
         self.production_rules = {
             'S': ('aS', 'bS', 'cA'),
-            'A': ('aB'),
+            'A': ('aB',),
             'B': ('aB', 'bB', 'c')
         }
 
@@ -55,7 +55,7 @@ class Grammar:
         fa.add_transition('A', 'a', 'B')
         fa.add_transition('B', 'a', 'B')
         fa.add_transition('B', 'b', 'B')
-        fa.add_transition('B', 'c', '')
+        fa.add_transition('B', 'c', 'final')
 
         return fa
 
